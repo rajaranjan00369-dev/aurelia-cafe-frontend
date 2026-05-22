@@ -4,6 +4,53 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, collection, addDoc, serverTimestamp, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { LocationService } from "./location-service.js";
 
+// Central API Configuration
+const AURELIA_CONFIG = window.AURELIA_CONFIG || {
+  productionBaseUrl: 'https://aurelia-cafe-customer-backend.onrender.com',
+  localBaseUrl: 'http://localhost:5000',
+  join: function(routePath) {
+    let baseUrl = window.AURELIA_API_URL;
+    if (!baseUrl) {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      baseUrl = isLocal ? this.localBaseUrl : this.productionBaseUrl;
+    }
+    baseUrl = baseUrl.replace(/\/+$/, '');
+    let cleanPath = routePath.replace(/^\/+/, '');
+    
+    let origin = baseUrl;
+    let basePaths = [];
+    try {
+      const urlObj = new URL(baseUrl);
+      origin = urlObj.origin;
+      basePaths = urlObj.pathname.split('/').filter(Boolean);
+    } catch (e) {
+      if (baseUrl.includes('://')) {
+        const parts = baseUrl.split('/');
+        origin = parts.slice(0, 3).join('/');
+        basePaths = parts.slice(3).filter(Boolean);
+      } else {
+        basePaths = baseUrl.split('/').filter(Boolean);
+        origin = '';
+      }
+    }
+    
+    const pathParts = cleanPath.split('/').filter(Boolean);
+    let overlapCount = 0;
+    const maxOverlap = Math.min(basePaths.length, pathParts.length);
+    for (let i = 1; i <= maxOverlap; i++) {
+      const baseSlice = basePaths.slice(-i);
+      const pathSlice = pathParts.slice(0, i);
+      if (JSON.stringify(baseSlice) === JSON.stringify(pathSlice)) {
+        overlapCount = i;
+      }
+    }
+    
+    const combinedPaths = basePaths.concat(pathParts.slice(overlapCount));
+    return origin ? `${origin}/${combinedPaths.join('/')}` : `/${combinedPaths.join('/')}`;
+  }
+};
+window.AURELIA_CONFIG = AURELIA_CONFIG;
+
 // 🔴 APNA CONFIG YAHA DALO
 const firebaseConfig = {
   apiKey: "AIzaSyC0-iqTVeo0L-PZ9og_699vCsdEtxfrlSc",
@@ -164,14 +211,8 @@ function listenToActiveOrders() {
 
 // ✦ DYNAMIC BRANDING INJECTOR
 async function initDynamicBranding() {
-  const apiBaseUrl = window.AURELIA_API_URL 
-    ? window.AURELIA_API_URL
-    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5000'
-        : 'https://aurelia-cafe-customer-backend.onrender.com/api/order/checkout');
-
   try {
-    const res = await fetch(`${apiBaseUrl}/api/site-settings`, { cache: "no-store" });
+    const res = await fetch(AURELIA_CONFIG.join('/api/booking/settings'), { cache: "no-store" });
     if (res.ok) {
       const result = await res.json();
       if (result.success && result.data && result.data.cafeName) {
@@ -267,11 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       // 🛑 SECURITY UPDATE: Frontend NEVER writes directly to Firestore anymore
-      const checkoutUrl = window.AURELIA_API_URL 
-        ? `${window.AURELIA_API_URL}/api/order/checkout`
-        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:5000/api/order/checkout'
-            : 'https://aurelia-cafe-customer-backend.onrender.com/api/order/checkout');
+      const checkoutUrl = AURELIA_CONFIG.join('/api/order/checkout');
 
       const response = await fetch(checkoutUrl, {
         method: 'POST',

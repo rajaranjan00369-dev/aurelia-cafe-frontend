@@ -32,12 +32,52 @@ const db  = getFirestore(app);
 const auth = getAuth(app);
 auth.useDeviceLanguage();
 
-// Backend API URL supporting local dev, production staging, or window override
-const API_BASE_URL = window.AURELIA_API_URL 
-    ? `${window.AURELIA_API_URL}/api/booking`
-    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5000/api/booking'
-        : 'https://aurelia-cafe-customer-backend.onrender.com');
+// Central API Configuration
+const AURELIA_CONFIG = window.AURELIA_CONFIG || {
+    productionBaseUrl: 'https://aurelia-cafe-customer-backend.onrender.com',
+    localBaseUrl: 'http://localhost:5000',
+    join: function(routePath) {
+        let baseUrl = window.AURELIA_API_URL;
+        if (!baseUrl) {
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            baseUrl = isLocal ? this.localBaseUrl : this.productionBaseUrl;
+        }
+        baseUrl = baseUrl.replace(/\/+$/, '');
+        let cleanPath = routePath.replace(/^\/+/, '');
+        
+        let origin = baseUrl;
+        let basePaths = [];
+        try {
+            const urlObj = new URL(baseUrl);
+            origin = urlObj.origin;
+            basePaths = urlObj.pathname.split('/').filter(Boolean);
+        } catch (e) {
+            if (baseUrl.includes('://')) {
+                const parts = baseUrl.split('/');
+                origin = parts.slice(0, 3).join('/');
+                basePaths = parts.slice(3).filter(Boolean);
+            } else {
+                basePaths = baseUrl.split('/').filter(Boolean);
+                origin = '';
+            }
+        }
+        
+        const pathParts = cleanPath.split('/').filter(Boolean);
+        let overlapCount = 0;
+        const maxOverlap = Math.min(basePaths.length, pathParts.length);
+        for (let i = 1; i <= maxOverlap; i++) {
+            const baseSlice = basePaths.slice(-i);
+            const pathSlice = pathParts.slice(0, i);
+            if (JSON.stringify(baseSlice) === JSON.stringify(pathSlice)) {
+                overlapCount = i;
+            }
+        }
+        
+        const combinedPaths = basePaths.concat(pathParts.slice(overlapCount));
+        return origin ? `${origin}/${combinedPaths.join('/')}` : `/${combinedPaths.join('/')}`;
+    }
+};
+window.AURELIA_CONFIG = AURELIA_CONFIG;
 
 // Development test mode configurations
 const IS_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -169,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadSettings() {
     try {
-        const res = await fetch(`${API_BASE_URL}/settings`, { cache: "no-store" });
+        const res = await fetch(AURELIA_CONFIG.join('/api/booking/settings'), { cache: "no-store" });
         const result = await res.json();
         if (result.success && result.data) {
             const data = result.data;
@@ -757,12 +797,12 @@ async function initiatePayment(idToken) {
     // Ensure the booking payload phone is normalized to strict E.164 format before sending
     currentBookingData.phone = normalizedBookingPhone;
 
-    console.log(`[Booking] Calling Backend API: ${API_BASE_URL}/create-order`);
+    console.log(`[Booking] Calling Backend API: ${AURELIA_CONFIG.join('/api/booking/create-order')}`);
     try {
         // 1. Call Backend to Create Order
         let response;
         try {
-            response = await fetch(`${API_BASE_URL}/create-order`, {
+            response = await fetch(AURELIA_CONFIG.join('/api/booking/create-order'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -850,7 +890,7 @@ async function verifyPaymentOnServer(paymentResponse) {
             throw new Error("User session not found.");
         }
         
-        const verifyRes = await fetch(`${API_BASE_URL}/verify-payment`, {
+        const verifyRes = await fetch(AURELIA_CONFIG.join('/api/booking/verify-payment'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
