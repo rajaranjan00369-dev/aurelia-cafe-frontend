@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if admin account document exists and get the role
+    function getAdminRole() {
+      return get(/databases/$(database)/documents/admin_accounts/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'super_admin' || 
+        getAdminRole() == 'Super Admin'
+      );
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'admin' || 
+        request.auth.token.role == 'super_admin' || 
+        getAdminRole() == 'Super Admin' || 
+        getAdminRole() == 'Manager'
+      );
+    }
+
+    function isStaff() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'staff' || 
+        isAdmin() || 
+        getAdminRole() == 'Caretaker'
+      );
+    }
+
+    // ─── Reservations (Customers can only look up their specific confirmed reservation) ───
+    match /reservations/{reservationId} {
+      allow get: if isStaff() || (isAuthenticated() && resource.data.phone == request.auth.token.phone_number);
+      allow list: if isStaff();
+      allow write: if false; // BACKEND ONLY
+    }
+
+    // ─── Orders (Customers tracking active orders can only read single doc by ID) ───
+    match /orders/{orderId} {
+      allow get: if true; // Public can get their own order by ID from localStorage
+      allow list: if isStaff();
+      allow write: if false; // BACKEND ONLY (through /api/order/checkout)
+    }
+
+    // ─── Locations & Seating (Public read, admin/manager write) ───
+    match /branches/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /floors/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /tables/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /seatingAreas/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Menu Categories & Products (Public read, admin/manager write) ───
+    match /categories/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Admin settings configuration (Super Admin ONLY) ───
+    match /paymentSettings/{document=**} {
+      allow read, write: if isSuperAdmin();
+    }
+
+    // ─── Admin Accounts List (Only Super Admin can modify or read all) ───
+    match /admin_accounts/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      allow write: if isSuperAdmin();
+    }
+
+    // ─── Temporary booking sessions & logs (Server ONLY) ───
+    match /booking_sessions/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /paymentLogs/{document=**} {
+      allow read, write: if false;
+    }
+
+    match /bookingTransactions/{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

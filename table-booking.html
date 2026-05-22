@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Booking | Aurelia Cafe — Reserve Your Perfect Spot</title>
+    <meta name="description" content="Book a table at Aurelia Cafe. Enjoy a luxury dining experience with premium ambience, great coffee, and exceptional service. Reserve your table online in seconds.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="table-booking.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+    <div id="mainContent" class="main-content">
+        <!-- Background effects -->
+        <div class="bg-gradient"></div>
+        <div class="smoke-overlay"></div>
+
+        <!-- Floating beans -->
+        <div class="floating-beans" aria-hidden="true">
+            <div class="bean bean-1"></div>
+            <div class="bean bean-2"></div>
+            <div class="bean bean-3"></div>
+            <div class="bean bean-4"></div>
+            <div class="bean bean-5"></div>
+            <div class="bean bean-6"></div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <div class="logo">AURELIA CAFE</div>
+                <div class="nav-links">
+                    <a href="./index.html" class="nav-link">HOME</a>
+                    <a href="./index.html#menu" class="nav-link">MENU</a>
+                    <div class="cart-icon-btn" id="openCartBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        CART
+                        <span class="cart-badge" id="cartBadge">0</span>
+                    </div>
+                    <a href="./table-booking.html" class="nav-link nav-link-active-page">TABLE BOOKING</a>
+                    <a href="./about-us.html" class="nav-link">ABOUT US</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ===== BOOKING HERO SECTION ===== -->
+        <section class="booking-hero" id="table-booking">
+
+            <!-- Cinematic Background Image -->
+            <div class="booking-bg-image">
+                <img src="images/booking-bg.jpg"
+                     alt="Luxury cafe ambience"
+                     onerror="this.onerror=null; this.parentElement.style.background='linear-gradient(135deg,#1a0d06 0%,#2a1a10 100%)';">
+                <div class="booking-bg-overlay"></div>
+            </div>
+
+            <!-- Main Two-Column Layout -->
+            <div class="booking-layout">
+
+                <!-- LEFT: Form Card -->
+                <div class="booking-form-card reveal-on-scroll">
+                    <div class="booking-form-header">
+                        <p class="form-eyebrow">BOOK YOUR TABLE</p>
+                        <div class="form-eyebrow-divider">
+                            <span class="divider-line"></span>
+                            <span class="divider-diamond"></span>
+                            <span class="divider-line"></span>
+                        </div>
+                        <h1 class="form-title">Reserve Your<br><em>Perfect Spot</em></h1>
+                        <p class="form-subtitle">Enjoy a delightful experience by booking<br>your table in advance.</p>
+                    </div>
+
+                    <form class="booking-form" id="bookingForm" novalidate>
+
+                        <!-- Row: Name + Phone -->
+                        <div class="form-row">
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingName">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                    FULL NAME
+                                </label>
+                                <input type="text" id="bookingName" class="booking-input" placeholder="Your full name" required>
+                                <span class="booking-error" id="nameError">Please enter your full name.</span>
+                            </div>
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingPhone">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.29 6.29l1.17-1.17a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                    </svg>
+                                    PHONE NUMBER
+                                </label>
+                                <input type="tel" id="bookingPhone" class="booking-input" placeholder="+91 00000 00000" required>
+                                <span class="booking-error" id="phoneError">Please enter a valid phone number.</span>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="booking-form-group">
+                            <label class="booking-label" for="bookingEmail">
+                                <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                    <polyline points="22,6 12,13 2,6"/>
+                                </svg>
+                                EMAIL ADDRESS
+                            </label>
+                            <input type="email" id="bookingEmail" class="booking-input" placeholder="your@email.com" required>
+                            <span class="booking-error" id="emailError">Please enter a valid email address.</span>
+                        </div>
+
+                        <!-- Row: Date + Time -->
+                        <div class="form-row">
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingDate">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                        <line x1="16" y1="2" x2="16" y2="6"/>
+                                        <line x1="8" y1="2" x2="8" y2="6"/>
+                                        <line x1="3" y1="10" x2="21" y2="10"/>
+                                    </svg>
+                                    DATE
+                                </label>
+                                <div class="select-wrapper">
+                                    <input type="date" id="bookingDate" class="booking-input booking-date" required>
+                                    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </div>
+                                <span class="booking-error" id="dateError">Please select a valid date.</span>
+                            </div>
+
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingTime">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                    TIME SLOT
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="bookingTime" class="booking-select" required>
+                                        <option value="" disabled selected>Select Time</option>
+                                        <option value="08:00 AM">08:00 AM</option>
+                                        <option value="09:00 AM">09:00 AM</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="11:00 AM">11:00 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="01:00 PM">01:00 PM</option>
+                                        <option value="02:00 PM">02:00 PM</option>
+                                        <option value="03:00 PM">03:00 PM</option>
+                                        <option value="04:00 PM">04:00 PM</option>
+                                        <option value="05:00 PM">05:00 PM</option>
+                                        <option value="06:00 PM">06:00 PM</option>
+                                        <option value="07:00 PM">07:00 PM</option>
+                                        <option value="08:00 PM">08:00 PM</option>
+                                        <option value="09:00 PM">09:00 PM</option>
+                                        <option value="10:00 PM">10:00 PM</option>
+                                    </select>
+                                    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </div>
+                                <span class="booking-error" id="timeError">Please select a time slot.</span>
+                            </div>
+                        </div>
+
+                        <!-- Row: Guests + Branch -->
+                        <div class="form-row">
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingGuests">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                    NUMBER OF GUESTS
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="bookingGuests" class="booking-select" required>
+                                        <option value="" disabled selected>Select Number of Guests</option>
+                                        <option value="1">1 Guest</option>
+                                        <option value="2">2 Guests</option>
+                                        <option value="3">3 Guests</option>
+                                        <option value="4">4 Guests</option>
+                                        <option value="5">5 Guests</option>
+                                        <option value="6">6 Guests</option>
+                                        <option value="7">7 Guests</option>
+                                        <option value="8">8 Guests</option>
+                                        <option value="9">9 Guests</option>
+                                        <option value="10">10+ Guests</option>
+                                    </select>
+                                    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </div>
+                                <span class="booking-error" id="guestsError">Please select number of guests.</span>
+                            </div>
+
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingBranch">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                    BRANCH
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="bookingBranch" class="booking-select" required>
+                                        <option value="" disabled selected>Select Branch</option>
+                                    </select>
+                                    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </div>
+                                <span class="booking-error" id="branchError">Please select a branch.</span>
+                            </div>
+                        </div>
+
+                        <!-- Row: Floor + Table -->
+                        <div class="form-row">
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingFloor">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                    </svg>
+                                    SELECT FLOOR
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="bookingFloor" class="booking-select" required disabled>
+                                        <option value="" disabled selected>Select Floor</option>
+                                    </select>
+                                    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </div>
+                                <span class="booking-error" id="floorError">Please select a floor.</span>
+                            </div>
+
+                            <div class="booking-form-group">
+                                <label class="booking-label" for="bookingTable">
+                                    <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                                        <polyline points="9 22 9 12 15 12 15 22"/>
+                                    </svg>
+                                    SELECT TABLE
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="bookingTable" class="booking-select" required disabled>
+                                        <option value="" disabled selected>Select Table</option>
+                                    </select>
+                                    <svg class="select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </div>
+                                <span class="booking-error" id="tableError">Please select a table.</span>
+                            </div>
+                        </div>
+
+                        <!-- Special Request -->
+                        <div class="booking-form-group">
+                            <label class="booking-label" for="bookingSpecial">
+                                <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                SPECIAL REQUEST <span class="optional-tag">(OPTIONAL)</span>
+                            </label>
+                            <textarea id="bookingSpecial" class="booking-textarea" rows="3" placeholder="Any special request?"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="booking-submit-btn" id="bookingSubmitBtn">
+                            <span class="btn-text">FIND AVAILABLE TABLES</span>
+                            <span class="btn-loading" style="display:none;">
+                                <span class="spinner"></span>
+                                BOOKING...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- RIGHT: Cinematic Image Panel -->
+                <div class="booking-image-panel reveal-on-scroll delay-1">
+                    <div class="image-panel-inner">
+                        <img src="images/booking-bg.jpg"
+                             alt="Reserved table at Aurelia Cafe"
+                             class="panel-image"
+                             onerror="this.onerror=null; this.style.opacity='0';">
+                        <div class="image-panel-overlay"></div>
+                        <div class="image-panel-content">
+                            <h2 class="panel-title-top">Good Coffee</h2>
+                            <h2 class="panel-title-italic"><em>Great Moments</em></h2>
+                            <div class="panel-heart-divider">
+                                <span class="divider-line-sm"></span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(198,156,109,0.6)" stroke="none">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                                <span class="divider-line-sm"></span>
+                            </div>
+                            <p class="panel-subtitle">From rich aromas to warm ambiance,<br>we make every visit memorable.</p>
+
+                            <!-- Reserved For You card -->
+                            <div class="reserved-card">
+                                <div class="reserved-card-ornament top">✦</div>
+                                <p class="reserved-text">RESERVED<br>FOR YOU</p>
+                                <div class="reserved-card-ornament bottom">✦</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /.booking-layout -->
+        </section>
+
+        <!-- ===== FEATURE CARDS SECTION ===== -->
+        <section class="booking-features-section">
+            <div class="booking-features-grid">
+
+                <div class="feature-card reveal-on-scroll">
+                    <div class="feature-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8" y1="2" x2="8" y2="6"/>
+                            <line x1="3" y1="10" x2="21" y2="10"/>
+                        </svg>
+                    </div>
+                    <div class="feature-text">
+                        <h3 class="feature-title">Easy Booking</h3>
+                        <p class="feature-desc">Book your table in just a few clicks.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card reveal-on-scroll delay-1">
+                    <div class="feature-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </div>
+                    <div class="feature-text">
+                        <h3 class="feature-title">Premium Ambience</h3>
+                        <p class="feature-desc">Comfortable seating and a cozy atmosphere.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card reveal-on-scroll delay-1">
+                    <div class="feature-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                            <line x1="6" y1="1" x2="6" y2="4"/>
+                            <line x1="10" y1="1" x2="10" y2="4"/>
+                            <line x1="14" y1="1" x2="14" y2="4"/>
+                        </svg>
+                    </div>
+                    <div class="feature-text">
+                        <h3 class="feature-title">Great Experience</h3>
+                        <p class="feature-desc">Delicious coffee and exceptional service.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card reveal-on-scroll delay-2">
+                    <div class="feature-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                    </div>
+                    <div class="feature-text">
+                        <h3 class="feature-title">Timely Reminders</h3>
+                        <p class="feature-desc">Get reminders so you never miss your booking.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Cart Sidebar -->
+        <div class="cart-overlay" id="cartOverlay"></div>
+        <div class="cart-panel" id="cartPanel">
+            <div class="cart-header">
+                <h3>Your Cart</h3>
+                <button class="close-cart-btn" id="closeCartBtn">&times;</button>
+            </div>
+            <div class="cart-items" id="cartItemsContainer">
+                <div class="empty-cart-msg">Your cart is empty.</div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total</span>
+                    <span id="cartTotalValue">₹0</span>
+                </div>
+                <button class="checkout-btn" id="proceedCheckoutBtn">Proceed to Checkout</button>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div class="modal-overlay" id="checkoutModal">
+            <div class="modal-container checkout-container">
+                <button class="modal-close" id="closeCheckoutBtn">&times;</button>
+                <div class="checkout-content">
+                    <h3 class="checkout-title">Complete Your Order</h3>
+                    <form id="checkoutForm" class="checkout-form">
+                        <div class="form-group">
+                            <label for="checkoutName">Full Name *</label>
+                            <input type="text" id="checkoutName" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutPhone">Phone Number *</label>
+                            <input type="tel" id="checkoutPhone" required maxlength="10" pattern="[0-9]{10}">
+                            <span class="error-msg" id="phoneError">Please enter a valid phone number.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutBranch">Select Branch</label>
+                            <select id="checkoutBranch">
+                                <option value="downtown">Downtown Cafe</option>
+                                <option value="uptown">Uptown Roastery</option>
+                                <option value="midtown">Midtown Express</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutTable">Table Number (Optional)</label>
+                            <input type="number" id="checkoutTable" placeholder="e.g. 12">
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutNotes">Special Notes</label>
+                            <textarea id="checkoutNotes" rows="3" placeholder="Any special requests?"></textarea>
+                        </div>
+                        <button type="submit" class="submit-order-btn">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /#mainContent -->
+
+    <!-- OTP Verification Modal -->
+    <div class="modal-overlay" id="otpModal">
+        <div class="modal-container checkout-container">
+            <button class="modal-close" id="closeOtpBtn">&times;</button>
+            <div class="checkout-content text-center">
+                <h3 class="checkout-title">Verify Phone Number</h3>
+                <p class="form-subtitle mb-4">We've sent an OTP to <span id="otpPhoneDisplay" style="color: #C69C6D; font-weight: 500;"></span></p>
+                <div class="form-group mb-4" style="text-align: center;">
+                    <input type="text" id="otpInput" class="booking-input" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5em; padding: 12px;" placeholder="000000" maxlength="6">
+                    <span class="booking-error" id="otpError" style="display: block; margin-top: 8px;">Invalid OTP. Please try again.</span>
+                </div>
+                <button type="button" class="booking-submit-btn" id="verifyOtpBtn" style="margin-top: 20px;">
+                    <span class="btn-text">VERIFY & PROCEED TO PAYMENT</span>
+                    <span class="btn-loading" style="display:none;">
+                        <span class="spinner"></span>
+                        VERIFYING...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden Recaptcha Container -->
+    <div id="recaptcha-container"></div>
+
+    <!-- Success Toast -->
+    <div class="booking-toast" id="bookingToast">
+        <div class="toast-inner">
+            <div class="toast-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <div class="toast-content">
+                <p class="toast-title">Booking Confirmed!</p>
+                <p class="toast-msg">Your table has been reserved. See you soon! ☕</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Toast -->
+    <div class="booking-toast booking-toast-error" id="bookingToastError">
+        <div class="toast-inner">
+            <div class="toast-icon toast-icon-error">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+            </div>
+            <div class="toast-content">
+                <p class="toast-title">Booking Failed</p>
+                <p class="toast-msg" id="toastErrorMsg">Something went wrong. Please try again.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+    <script type="module" src="app.js"></script>
+    <script type="module" src="table-booking.js"></script>
+</body>
+
+</html>

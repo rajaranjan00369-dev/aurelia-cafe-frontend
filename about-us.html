@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Aurelia Cafe — More Than Just Coffee</title>
+    <meta name="description" content="Learn about Aurelia Cafe — where every detail is crafted with love and passion. Discover our story, values, and what makes us more than just a coffee shop.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="about-us.css">
+</head>
+
+<body>
+    <div id="mainContent" class="main-content">
+        <!-- Background -->
+        <div class="bg-gradient"></div>
+        <div class="smoke-overlay"></div>
+
+        <!-- Floating beans -->
+        <div class="floating-beans" aria-hidden="true">
+            <div class="bean bean-1"></div>
+            <div class="bean bean-2"></div>
+            <div class="bean bean-3"></div>
+            <div class="bean bean-4"></div>
+            <div class="bean bean-5"></div>
+            <div class="bean bean-6"></div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <div class="logo">AURELIA CAFE</div>
+                <div class="nav-links">
+                    <a href="./index.html" class="nav-link">HOME</a>
+                    <a href="./index.html#menu" class="nav-link">MENU</a>
+                    <div class="cart-icon-btn" id="openCartBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                        CART
+                        <span class="cart-badge" id="cartBadge">0</span>
+                    </div>
+                    <a href="./table-booking.html" class="nav-link">TABLE BOOKING</a>
+                    <a href="./about-us.html" class="nav-link nav-link-active-page">ABOUT US</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ===== ABOUT PAGE CONTENT ===== -->
+        <section class="about-section" id="about-us">
+
+            <!-- ── TOP HEADER ── -->
+            <div class="about-header reveal-on-scroll">
+                <!-- Ornamental icon -->
+                <div class="about-ornament" aria-hidden="true">
+                    <svg width="60" height="50" viewBox="0 0 60 50" fill="none">
+                        <path d="M30 5 C20 5, 10 12, 8 22 C6 30, 10 38, 20 42 L30 45 L40 42 C50 38, 54 30, 52 22 C50 12, 40 5, 30 5Z" fill="rgba(198,156,109,0.15)" stroke="rgba(198,156,109,0.4)" stroke-width="1"/>
+                        <!-- Coffee bean detail -->
+                        <ellipse cx="30" cy="25" rx="8" ry="12" fill="rgba(198,156,109,0.6)" stroke="rgba(198,156,109,0.8)" stroke-width="0.5"/>
+                        <path d="M30 13 Q30 25 30 37" stroke="rgba(10,6,3,0.8)" stroke-width="1.2" stroke-linecap="round"/>
+                        <!-- Leaf left -->
+                        <path d="M20 10 Q14 4, 8 8 Q12 14, 20 14 Z" fill="rgba(198,156,109,0.4)" stroke="rgba(198,156,109,0.6)" stroke-width="0.5"/>
+                        <!-- Leaf right -->
+                        <path d="M40 10 Q46 4, 52 8 Q48 14, 40 14 Z" fill="rgba(198,156,109,0.4)" stroke="rgba(198,156,109,0.6)" stroke-width="0.5"/>
+                    </svg>
+                </div>
+
+                <!-- Label with lines -->
+                <div class="about-eyebrow-row">
+                    <span class="eyebrow-line"></span>
+                    <span class="about-eyebrow-label" id="aboutHeadingLabel">ABOUT AURELIA CAFE</span>
+                    <span class="eyebrow-line"></span>
+                </div>
+
+                <!-- Main Title -->
+                <h1 class="about-main-title" id="aboutTitle">More Than Just Coffee</h1>
+
+                <!-- Description -->
+                <p class="about-description" id="aboutDescription">
+                    At Aurelia Cafe, we believe in creating moments that matter.<br>
+                    From perfectly brewed coffee to freshly baked pastries,<br>
+                    every detail is crafted with love and passion.
+                </p>
+
+                <!-- Shimmer loading state -->
+                <div class="about-content-shimmer" id="aboutShimmer">
+                    <div class="shimmer-line shimmer-line-sm"></div>
+                    <div class="shimmer-line shimmer-line-lg"></div>
+                    <div class="shimmer-line shimmer-line-md"></div>
+                </div>
+            </div>
+
+            <!-- ── INFO ROW ── -->
+            <div class="about-info-row reveal-on-scroll delay-1">
+
+                <div class="info-item">
+                    <div class="info-icon-circle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6.29 6.29l1.17-1.17a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                    </div>
+                    <div class="info-text">
+                        <span class="info-label">PHONE</span>
+                        <span class="info-value" id="aboutPhone">+91 98765 43210</span>
+                    </div>
+                </div>
+
+                <div class="info-divider"></div>
+
+                <div class="info-item">
+                    <div class="info-icon-circle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                    </div>
+                    <div class="info-text">
+                        <span class="info-label">LOCATION</span>
+                        <span class="info-value" id="aboutLocation">123, Coffee Lane,<br>Brewville, India</span>
+                    </div>
+                </div>
+
+                <div class="info-divider"></div>
+
+                <div class="info-item">
+                    <div class="info-icon-circle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div class="info-text">
+                        <span class="info-label">OPENING HOURS</span>
+                        <span class="info-value" id="aboutHours">Mon - Sun<br>8:00 AM – 11:00 PM</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ── MAIN BOTTOM SECTION: Slider + Rating ── -->
+            <div class="about-main-grid">
+
+                <!-- LEFT: Image Slider -->
+                <div class="about-slider-wrap reveal-on-scroll">
+                    <div class="about-slider" id="aboutSlider">
+                        <!-- Slides injected by JS -->
+                        <div class="about-slide-shimmer" id="sliderShimmer"></div>
+                    </div>
+
+                    <!-- Pagination dots -->
+                    <div class="about-slider-dots" id="aboutSliderDots"></div>
+                </div>
+
+                <!-- RIGHT: Rating Card -->
+                <div class="rating-card reveal-on-scroll delay-1">
+
+                    <!-- Customer Rating -->
+                    <div class="rating-header">
+                        <p class="rating-label">CUSTOMER RATING</p>
+                        <div class="rating-ornament">
+                            <span class="ornament-line"></span>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(198,156,109,0.5)" stroke="none">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                            <span class="ornament-line"></span>
+                        </div>
+                    </div>
+
+                    <!-- Average + Stars -->
+                    <div class="rating-display">
+                        <span class="rating-average" id="ratingAverage">4.7</span>
+                        <div class="rating-stars-display" id="ratingStarsDisplay">
+                            <!-- Filled dynamically -->
+                        </div>
+                    </div>
+                    <p class="rating-count" id="ratingCount">( Loading... )</p>
+
+                    <div class="rating-divider"></div>
+
+                    <!-- Give Your Rating -->
+                    <div class="give-rating-section">
+                        <p class="give-rating-label">GIVE YOUR RATING</p>
+                        <div class="interactive-stars" id="interactiveStars" role="group" aria-label="Star rating">
+                            <button class="i-star" data-val="1" aria-label="1 star">☆</button>
+                            <button class="i-star" data-val="2" aria-label="2 stars">☆</button>
+                            <button class="i-star" data-val="3" aria-label="3 stars">☆</button>
+                            <button class="i-star" data-val="4" aria-label="4 stars">☆</button>
+                            <button class="i-star" data-val="5" aria-label="5 stars">☆</button>
+                        </div>
+                        <button class="submit-rating-btn" id="submitRatingBtn">SUBMIT RATING</button>
+                    </div>
+
+                </div><!-- /.rating-card -->
+
+            </div><!-- /.about-main-grid -->
+
+        </section>
+
+        <!-- Cart Sidebar -->
+        <div class="cart-overlay" id="cartOverlay"></div>
+        <div class="cart-panel" id="cartPanel">
+            <div class="cart-header">
+                <h3>Your Cart</h3>
+                <button class="close-cart-btn" id="closeCartBtn">&times;</button>
+            </div>
+            <div class="cart-items" id="cartItemsContainer">
+                <div class="empty-cart-msg">Your cart is empty.</div>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total</span>
+                    <span id="cartTotalValue">₹0</span>
+                </div>
+                <button class="checkout-btn" id="proceedCheckoutBtn">Proceed to Checkout</button>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div class="modal-overlay" id="checkoutModal">
+            <div class="modal-container checkout-container">
+                <button class="modal-close" id="closeCheckoutBtn">&times;</button>
+                <div class="checkout-content">
+                    <h3 class="checkout-title">Complete Your Order</h3>
+                    <form id="checkoutForm" class="checkout-form">
+                        <div class="form-group">
+                            <label for="checkoutName">Full Name *</label>
+                            <input type="text" id="checkoutName" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutPhone">Phone Number *</label>
+                            <input type="tel" id="checkoutPhone" required maxlength="10" pattern="[0-9]{10}">
+                            <span class="error-msg" id="phoneError">Please enter a valid phone number.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutBranch">Select Branch</label>
+                            <select id="checkoutBranch">
+                                <option value="downtown">Downtown Cafe</option>
+                                <option value="uptown">Uptown Roastery</option>
+                                <option value="midtown">Midtown Express</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutTable">Table Number (Optional)</label>
+                            <input type="number" id="checkoutTable" placeholder="e.g. 12">
+                        </div>
+                        <div class="form-group">
+                            <label for="checkoutNotes">Special Notes</label>
+                            <textarea id="checkoutNotes" rows="3" placeholder="Any special requests?"></textarea>
+                        </div>
+                        <button type="submit" class="submit-order-btn">Place Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /#mainContent -->
+
+    <!-- ===== RATING MODAL ===== -->
+    <div class="rating-modal-overlay" id="ratingModal" role="dialog" aria-modal="true" aria-label="Submit Rating">
+        <div class="rating-modal-container">
+            <button class="rating-modal-close" id="ratingModalClose" aria-label="Close">&#x2715;</button>
+
+            <div class="rating-modal-header">
+                <p class="modal-eyebrow">SHARE YOUR EXPERIENCE</p>
+                <h2 class="modal-title">Rate Your Visit</h2>
+                <div class="modal-ornament">
+                    <span class="ornament-line-modal"></span>
+                    <svg width="8" height="8" viewBox="0 0 24 24" fill="rgba(198,156,109,0.6)" stroke="none">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span class="ornament-line-modal"></span>
+                </div>
+            </div>
+
+            <!-- Selected stars preview -->
+            <div class="modal-stars-preview">
+                <div class="modal-stars-row" id="modalStarsPreview">
+                    <span class="modal-star" data-val="1">☆</span>
+                    <span class="modal-star" data-val="2">☆</span>
+                    <span class="modal-star" data-val="3">☆</span>
+                    <span class="modal-star" data-val="4">☆</span>
+                    <span class="modal-star" data-val="5">☆</span>
+                </div>
+                <p class="modal-star-label" id="modalStarLabel">Select your rating</p>
+            </div>
+
+            <!-- Comment -->
+            <div class="modal-comment-group">
+                <label class="modal-comment-label" for="ratingComment">
+                    Leave a Comment
+                    <span class="optional-tag">(Optional)</span>
+                </label>
+                <textarea id="ratingComment" class="modal-textarea" rows="4"
+                    placeholder="Tell us about your experience at Aurelia Cafe..."></textarea>
+            </div>
+
+            <button class="modal-submit-btn" id="modalSubmitBtn">
+                <span class="btn-text">SUBMIT REVIEW</span>
+                <span class="btn-loading" style="display:none;">
+                    <span class="spinner"></span> SAVING...
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="booking-toast" id="ratingToast">
+        <div class="toast-inner">
+            <div class="toast-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <div class="toast-content">
+                <p class="toast-title">Thank You!</p>
+                <p class="toast-msg">Your review has been submitted. ☕</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+    <script type="module" src="app.js"></script>
+    <script type="module" src="about-us.js"></script>
+</body>
+
+</html>
