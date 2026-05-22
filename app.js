@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? `${window.AURELIA_API_URL}/api/order/checkout`
         : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:5000/api/order/checkout'
-            : 'https://aurelia-cafe-customer-backend.onrender.com');
+            : 'https://aurelia-cafe-customer-backend.onrender.com/api/order/checkout');
 
       const response = await fetch(checkoutUrl, {
         method: 'POST',
