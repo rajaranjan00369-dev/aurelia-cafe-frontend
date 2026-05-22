@@ -1,6 +1,7 @@
 // about-us.js
 // Aurelia Cafe — About Us Page Logic (Admin content, Slider, Ratings)
 
+import { logger } from "./logger.js";
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
     getFirestore,
@@ -88,15 +89,15 @@ function loadAboutContent() {
                 }
 
             } else {
-                console.warn('[AboutPage] about_us_settings/config not found. Using defaults.');
+                logger.warn('[AboutPage] about_us_settings/config not found. Using defaults.');
             }
             if (shimmer) shimmer.style.display = 'none';
         }, (error) => {
-            console.error('[AboutPage] Error loading content:', error);
+            logger.error('[AboutPage] Error loading content:', error);
             if (shimmer) shimmer.style.display = 'none';
         });
     } catch (error) {
-        console.error('[AboutPage] Error setting up listener:', error);
+        logger.error('[AboutPage] Error setting up listener:', error);
         if (shimmer) shimmer.style.display = 'none';
     }
 }
@@ -160,7 +161,7 @@ function initSlider() {
         currentSlide = 0; // reset to 0 on new data
         resetAutoPlay();
     }, (error) => {
-        console.error('[AboutPage] Error fetching slider images:', error);
+        logger.error('[AboutPage] Error fetching slider images:', error);
     });
 }
 
@@ -355,7 +356,7 @@ async function handleRatingSubmit() {
         highlightStars(document.querySelectorAll('.i-star'), 0, 'active');
 
     } catch (error) {
-        console.error('[AboutPage] Error submitting review:', error);
+        logger.error('[AboutPage] Error submitting review:', error);
         setModalLoadingState(false);
         alert('Failed to submit review. Please try again.');
     }

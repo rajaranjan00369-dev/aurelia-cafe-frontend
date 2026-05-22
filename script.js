@@ -1,6 +1,7 @@
 // =======================================================
 // PRODUCT DATA
 // =======================================================
+import { logger } from "./logger.js";
 import { getFirestore, collection, getDocs, orderBy, query }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 let products = [];
@@ -123,9 +124,12 @@ function formatTitle(str) {
 }
 
 function renderProducts() {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderProducts);
+        return;
+    }
     const container = getQ('#dynamic-menu-container');
     if (!container) {
-        console.warn('[renderProducts] Menu container not found!');
         return;
     }
 
@@ -144,8 +148,8 @@ function renderProducts() {
         productsBySlug[slug].push(product);
     });
 
-    console.log('[renderProducts] Products by slug:', Object.keys(productsBySlug));
-    console.log('[renderProducts] Firestore categories order:', firestoreCategories.map(c => c.slug));
+    logger.log('[renderProducts] Products by slug:', Object.keys(productsBySlug));
+    logger.log('[renderProducts] Firestore categories order:', firestoreCategories.map(c => c.slug));
 
     // Step 1 — render in Firestore category order (only if products exist)
     firestoreCategories.forEach(cat => {
@@ -159,14 +163,14 @@ function renderProducts() {
     // Step 2 — render any orphan categories not in Firestore (fallback)
     Object.keys(productsBySlug).forEach(slug => {
         if (productsBySlug[slug] && productsBySlug[slug].length > 0) {
-            console.log('[renderProducts] Orphan category (not in Firestore):', slug);
+            logger.log('[renderProducts] Orphan category (not in Firestore):', slug);
             renderCategorySection(container, formatTitle(slug), productsBySlug[slug]);
         }
     });
 }
 
 function renderCategorySection(container, title, catProducts) {
-    console.log("Creating category section:", title, "| Products:", catProducts.length);
+    logger.log("Creating category section:", title, "| Products:", catProducts.length);
 
     const section = document.createElement('div');
     section.className = 'menu-category';
@@ -187,7 +191,7 @@ function renderCategorySection(container, title, catProducts) {
     grid.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:20px;';
 
     catProducts.forEach(product => {
-        console.log("Appending product:", product.name, "| Category:", product.category);
+        logger.log("Appending product:", product.name, "| Category:", product.category);
 
         const safeImage = product.image || product.imageUrl || product.img || 'images/latte.png';
         let stars = '';
@@ -227,7 +231,7 @@ function renderCategorySection(container, title, catProducts) {
 
     section.appendChild(grid);
     container.appendChild(section);
-    console.log("Section appended to DOM:", title);
+    logger.log("Section appended to DOM:", title);
 }
 
 // =======================================================
@@ -992,16 +996,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
 async function loadProductsFromFirebase() {
-    console.log('[Firebase] Loading products and categories...');
     const container = getQ('#dynamic-menu-container');
-
-    if (container) {
-        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #b59b7b;">Loading menu...</div>';
+    if (!container) {
+        return;
     }
+
+    logger.log('[Firebase] Loading products and categories...');
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #b59b7b;">Loading menu...</div>';
 
     try {
         if (!window.db) {
-            console.warn('[Firebase] window.db not ready, waiting 500ms...');
+            logger.warn('[Firebase] window.db not ready, waiting 500ms...');
             await new Promise(r => setTimeout(r, 500));
         }
 
@@ -1013,15 +1018,15 @@ async function loadProductsFromFirebase() {
                 query(collection(db, 'categories'), orderBy('name', 'asc'))
             );
             firestoreCategories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            console.log('[Firebase] Categories loaded:', firestoreCategories.map(c => c.slug));
+            logger.log('[Firebase] Categories loaded:', firestoreCategories.map(c => c.slug));
         } catch (catErr) {
-            console.warn('[Firebase] Could not load categories (collection may be empty):', catErr.message);
+            logger.warn('[Firebase] Could not load categories (collection may be empty):', catErr.message);
             firestoreCategories = [];
         }
 
         // ── Fetch products ───────────────────────────────────────────────
         const querySnapshot = await getDocs(collection(db, 'products'));
-        console.log('[Firebase] Products fetched:', querySnapshot.size);
+        logger.log('[Firebase] Products fetched:', querySnapshot.size);
 
         products = [];
         querySnapshot.forEach(doc => {
@@ -1038,11 +1043,11 @@ async function loadProductsFromFirebase() {
             });
         });
 
-        console.log('[Firebase] Normalized products:', products);
+        logger.log('[Firebase] Normalized products:', products);
         renderProducts();
 
     } catch (error) {
-        console.error('[Firebase] Error loading data:', error);
+        logger.error('[Firebase] Error loading data:', error);
         if (container) {
             container.innerHTML = '<div style="text-align: center; padding: 40px; color: red;">Failed to load menu. Please try again later.</div>';
         }

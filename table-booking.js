@@ -1,6 +1,5 @@
-// table-booking.js
-// Aurelia Cafe — Table Booking Firebase Integration
-
+import { logger, IS_PRODUCTION } from "./logger.js";
+import { safeFetch } from "./api-helper.js";
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
     getFirestore,
@@ -39,8 +38,7 @@ const AURELIA_CONFIG = window.AURELIA_CONFIG || {
     join: function(routePath) {
         let baseUrl = window.AURELIA_API_URL;
         if (!baseUrl) {
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            baseUrl = isLocal ? this.localBaseUrl : this.productionBaseUrl;
+            baseUrl = (!IS_PRODUCTION) ? this.localBaseUrl : this.productionBaseUrl;
         }
         baseUrl = baseUrl.replace(/\/+$/, '');
         let cleanPath = routePath.replace(/^\/+/, '');
@@ -80,7 +78,7 @@ const AURELIA_CONFIG = window.AURELIA_CONFIG || {
 window.AURELIA_CONFIG = AURELIA_CONFIG;
 
 // Development test mode configurations
-const IS_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const IS_DEV = !IS_PRODUCTION;
 
 // Central E.164 phone normalization function
 function normalizePhone(phone) {
@@ -115,6 +113,7 @@ let verifiedUserPhone = null;
 let currentBookingData = null;
 let currentAssignedTable = null;
 let loadedCafeName = 'Aurelia Cafe';
+let isPaymentModalOpen = false;
 
 // Secure Auth State Gate
 const authState = {
@@ -209,9 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadSettings() {
     try {
-        const res = await fetch(AURELIA_CONFIG.join('/api/booking/settings'), { cache: "no-store" });
-        const result = await res.json();
-        if (result.success && result.data) {
+        const result = await safeFetch(AURELIA_CONFIG.join('/api/booking/settings'), { cache: "no-store" });
+        if (result && result.success && result.data) {
             const data = result.data;
             console.log('[Settings] Loaded settings:', data);
             
@@ -277,6 +275,9 @@ function initializeRecaptcha() {
         console.log("[Auth] Using existing verifier.");
         return window.recaptchaVerifier;
     }
+
+    // Clear inner content to prevent duplicate widget rendering issues
+    container.innerHTML = '';
 
     // 3. Initialize new verifier safely
     try {
@@ -781,6 +782,12 @@ async function initiatePayment(idToken) {
         return;
     }
 
+    if (isPaymentModalOpen) {
+        console.warn("[Booking] Razorpay payment modal is already open.");
+        return;
+    }
+    isPaymentModalOpen = true;
+
     // Normalize phone numbers before sending/comparing
     const rawBookingPhone = currentBookingData.phone || '';
     const rawAuthPhone = verifiedUserPhone || auth.currentUser?.phoneNumber || auth.currentUser?.phone_number || '';
@@ -800,9 +807,9 @@ async function initiatePayment(idToken) {
     console.log(`[Booking] Calling Backend API: ${AURELIA_CONFIG.join('/api/booking/create-order')}`);
     try {
         // 1. Call Backend to Create Order
-        let response;
+        let data;
         try {
-            response = await fetch(AURELIA_CONFIG.join('/api/booking/create-order'), {
+            data = await safeFetch(AURELIA_CONFIG.join('/api/booking/create-order'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -813,21 +820,9 @@ async function initiatePayment(idToken) {
         } catch (networkError) {
             throw new Error(`Cannot connect to backend server at port 5000. Is it running? (${networkError.message})`);
         }
-        
-        console.log(`[Booking] Backend response received: HTTP ${response.status}`);
 
-        // Safe JSON parse: detect HTML error pages (404/500)
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('application/json')) {
-            const rawText = await response.text();
-            console.error('[Booking] Non-JSON response from backend:', rawText.substring(0, 200));
-            throw new Error(`Backend returned HTTP ${response.status}. Route may not exist. Check that backend server is running.`);
-        }
-
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error(data.message || 'Failed to initialize payment on the server.');
+        if (!data || !data.success) {
+            throw new Error(data?.message || 'Failed to initialize payment on the server.');
         }
 
         console.log('[Booking] Opening Razorpay UI...');
@@ -840,6 +835,7 @@ async function initiatePayment(idToken) {
             image: `${window.location.origin}/images/logo.png`, // Add logo if available
             order_id: data.order.id,
             handler: async function (paymentResponse) {
+                isPaymentModalOpen = false;
                 await verifyPaymentOnServer(paymentResponse);
             },
             prefill: {
@@ -852,21 +848,47 @@ async function initiatePayment(idToken) {
             },
             modal: {
                 ondismiss: function() {
+                    isPaymentModalOpen = false;
                     resetVerifyBtn();
                     showToast('error', 'Payment cancelled.');
                 }
             }
         };
 
-        const rzp = new Razorpay(options);
+        let rzp;
+        try {
+            if (typeof Razorpay === 'undefined') {
+                throw new Error("Razorpay SDK is not loaded. Please disable your ad blocker or check your internet connection.");
+            }
+            rzp = new Razorpay(options);
+        } catch (initError) {
+            isPaymentModalOpen = false;
+            console.error('[Booking] Failed to initialize Razorpay:', initError);
+            resetVerifyBtn();
+            setBookingState('otp_sent');
+            showToast('error', initError.message || 'Payment initialization failed. Please try again.');
+            return;
+        }
+
         rzp.on('payment.failed', function (response){
+            isPaymentModalOpen = false;
             console.error('[Booking] Razorpay Payment Failed:', response.error);
             resetVerifyBtn();
             showToast('error', response.error.description || 'Payment failed.');
         });
-        rzp.open();
+
+        try {
+            rzp.open();
+        } catch (openError) {
+            isPaymentModalOpen = false;
+            console.error('[Booking] Failed to open Razorpay modal:', openError);
+            resetVerifyBtn();
+            setBookingState('otp_sent');
+            showToast('error', 'Failed to open payment modal. Please enable popups if blocked.');
+        }
         
     } catch (error) {
+        isPaymentModalOpen = false;
         console.error("[Booking] Error initiating payment:", error);
         resetVerifyBtn();
         setBookingState('otp_sent');
@@ -890,23 +912,25 @@ async function verifyPaymentOnServer(paymentResponse) {
             throw new Error("User session not found.");
         }
         
-        const verifyRes = await fetch(AURELIA_CONFIG.join('/api/booking/verify-payment'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authIdToken}`
-            },
-            body: JSON.stringify({
-                razorpay_order_id: paymentResponse.razorpay_order_id,
-                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                razorpay_signature: paymentResponse.razorpay_signature
-            })
-        });
+        let data;
+        try {
+            data = await safeFetch(AURELIA_CONFIG.join('/api/booking/verify-payment'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authIdToken}`
+                },
+                body: JSON.stringify({
+                    razorpay_order_id: paymentResponse.razorpay_order_id,
+                    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                    razorpay_signature: paymentResponse.razorpay_signature
+                })
+            });
+        } catch (netErr) {
+            throw new Error(`Connection to verification server failed. (${netErr.message})`);
+        }
 
-        console.log(`[Booking] Verify payment response received: HTTP ${verifyRes.status}`);
-        const data = await verifyRes.json();
-
-        if (data.success) {
+        if (data && data.success) {
             setBookingState('booking_complete');
             console.log('[Booking] Booking completely successful and verified!');
             closeOtpModal();
@@ -917,7 +941,7 @@ async function verifyPaymentOnServer(paymentResponse) {
             
             resetVerifyBtn();
         } else {
-            throw new Error(data.message || 'Payment verification failed on server.');
+            throw new Error(data?.message || 'Payment verification failed on server.');
         }
 
     } catch (error) {
@@ -957,7 +981,8 @@ function showToast(type, message) {
     const errMsgEl     = getEl('toastErrorMsg');
 
     if (type === 'success' && successToast) {
-        if (errMsgEl && message) successToast.querySelector('.toast-msg').textContent = message;
+        const successMsgEl = successToast.querySelector('.toast-msg');
+        if (successMsgEl && message) successMsgEl.textContent = message;
         successToast.classList.add('show');
         setTimeout(() => successToast.classList.remove('show'), 4500);
     } else if (type === 'error' && errorToast) {

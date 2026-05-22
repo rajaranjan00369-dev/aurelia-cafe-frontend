@@ -1,6 +1,6 @@
-// app.js
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { logger, IS_PRODUCTION } from "./logger.js";
+import { safeFetch } from "./api-helper.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { LocationService } from "./location-service.js";
 
@@ -11,8 +11,7 @@ const AURELIA_CONFIG = window.AURELIA_CONFIG || {
   join: function(routePath) {
     let baseUrl = window.AURELIA_API_URL;
     if (!baseUrl) {
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      baseUrl = isLocal ? this.localBaseUrl : this.productionBaseUrl;
+      baseUrl = (!IS_PRODUCTION) ? this.localBaseUrl : this.productionBaseUrl;
     }
     baseUrl = baseUrl.replace(/\/+$/, '');
     let cleanPath = routePath.replace(/^\/+/, '');
@@ -58,7 +57,7 @@ const firebaseConfig = {
   projectId: "coffee-shop-d4c22",
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 window.db = db;
 
@@ -212,32 +211,29 @@ function listenToActiveOrders() {
 // ✦ DYNAMIC BRANDING INJECTOR
 async function initDynamicBranding() {
   try {
-    const res = await fetch(AURELIA_CONFIG.join('/api/booking/settings'), { cache: "no-store" });
-    if (res.ok) {
-      const result = await res.json();
-      if (result.success && result.data && result.data.cafeName) {
-        const cafeName = result.data.cafeName;
-        
-        // 1. Update logo containers
-        const logos = document.querySelectorAll(".logo");
-        logos.forEach(el => {
-          el.textContent = cafeName.toUpperCase();
-        });
-        
-        // 2. Update about-us heading labels if present
-        const aboutHeading = document.getElementById("aboutHeadingLabel");
-        if (aboutHeading) {
-          aboutHeading.textContent = `ABOUT ${cafeName.toUpperCase()}`;
-        }
-        
-        // 3. Update document title
-        if (document.title.includes("Aurelia Cafe")) {
-          document.title = document.title.replace("Aurelia Cafe", cafeName);
-        }
+    const result = await safeFetch(AURELIA_CONFIG.join('/api/booking/settings'), { cache: "no-store" });
+    if (result && result.success && result.data && result.data.cafeName) {
+      const cafeName = result.data.cafeName;
+      
+      // 1. Update logo containers
+      const logos = document.querySelectorAll(".logo");
+      logos.forEach(el => {
+        el.textContent = cafeName.toUpperCase();
+      });
+      
+      // 2. Update about-us heading labels if present
+      const aboutHeading = document.getElementById("aboutHeadingLabel");
+      if (aboutHeading) {
+        aboutHeading.textContent = `ABOUT ${cafeName.toUpperCase()}`;
+      }
+      
+      // 3. Update document title
+      if (document.title.includes("Aurelia Cafe")) {
+        document.title = document.title.replace("Aurelia Cafe", cafeName);
       }
     }
   } catch (err) {
-    console.warn("Branding fetch failed, using default 'Aurelia Cafe':", err.message);
+    logger.warn("Branding fetch failed, using default 'Aurelia Cafe':", err.message);
   }
 }
 
@@ -310,15 +306,14 @@ document.addEventListener("DOMContentLoaded", () => {
       // 🛑 SECURITY UPDATE: Frontend NEVER writes directly to Firestore anymore
       const checkoutUrl = AURELIA_CONFIG.join('/api/order/checkout');
 
-      const response = await fetch(checkoutUrl, {
+      const result = await safeFetch(checkoutUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
       });
       
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'Failed to place order securely.');
+      if (!result || !result.success) {
+        throw new Error(result?.message || 'Failed to place order securely.');
       }
 
       // Add to active orders for UI listening
@@ -344,7 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
       form.reset();
 
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       alert("Error placing order");
     }
   });
