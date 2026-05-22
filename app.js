@@ -168,7 +168,7 @@ async function initDynamicBranding() {
     ? window.AURELIA_API_URL
     : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:5000'
-        : 'https://aurelia-cafe-customer-backend.onrender.com');
+        : 'https://aurelia-cafe-customer-backend.onrender.com/api/order/checkout');
 
   try {
     const res = await fetch(`${apiBaseUrl}/api/site-settings`, { cache: "no-store" });
